@@ -655,143 +655,193 @@ bool g_bRt = false;
 int g_argc;
 char **g_argv;
 
+
 int main(int argc, char **argv)
 {
-	g_argc = argc;
-	g_argv = argv;
+    g_argc = argc;
+    g_argv = argv;
 
-	// Force disable this horrible broken layer.
-	setenv("DISABLE_LAYER_AMD_SWITCHABLE_GRAPHICS_1", "1", 1);
+    // Force disable this horrible broken layer.
+    setenv("DISABLE_LAYER_AMD_SWITCHABLE_GRAPHICS_1", "1", 1);
 
-	static std::string optstring = build_optstring(gamescope_options);
-	gamescope_optstring = optstring.c_str();
+    static std::string optstring = build_optstring(gamescope_options);
+    gamescope_optstring = optstring.c_str();
 
-	gamescope::GamescopeBackend eCurrentBackend = gamescope::GamescopeBackend::Auto;
+    gamescope::GamescopeBackend eCurrentBackend = gamescope::GamescopeBackend::Auto;
 
-	gamescope::PrintVersion();
+    gamescope::PrintVersion();
 
-	int o;
-	int opt_index = -1;
-	while ((o = getopt_long(argc, argv, gamescope_optstring, gamescope_options, &opt_index)) != -1)
-	{
-		const char *opt_name;
-		switch (o) {
-			case 'w':
-				g_nNestedWidth = atoi( optarg );
-				break;
-			case 'h':
-				g_nNestedHeight = atoi( optarg );
-				break;
-			case 'r':
-				g_nNestedRefresh = gamescope::ConvertHztomHz( atoi( optarg ) );
-				break;
-			case 'W':
-				g_nPreferredOutputWidth = atoi( optarg );
-				break;
-			case 'H':
-				g_nPreferredOutputHeight = atoi( optarg );
-				break;
-			case 'o':
-				g_nNestedUnfocusedRefresh = gamescope::ConvertHztomHz( atoi( optarg ) );
-				break;
-			case 'm':
-				g_flMaxWindowScale = atof( optarg );
-				break;
-			case 'S':
-				g_wantedUpscaleScaler = parse_upscaler_scaler(optarg);
-				break;
-			case 'F':
-				g_wantedUpscaleFilter = parse_upscaler_filter(optarg);
-				break;
-			case 'b':
-				g_bBorderlessOutputWindow = true;
-				break;
-			case 'f':
-				g_bFullscreen = true;
-				break;
-			case 'O':
-				g_sOutputName = optarg;
-				break;
-			case 'g':
-				g_bGrabbed = true;
-				break;
-			case 's':
-				g_mouseSensitivity = atof( optarg );
-				break;
-			case 'e':
-				steamMode = true;
-				break;
-			case 0: // long options without a short option
-				opt_name = gamescope_options[opt_index].name;
-				if (strcmp(opt_name, "help") == 0) {
-					fprintf(stderr, "%s", usage);
-					return 0;
-				} else if (strcmp(opt_name, "version") == 0) {
-					// We always print the version to stderr anyway.
-					return 0;
-				} else if (strcmp(opt_name, "debug-layers") == 0) {
-					g_bDebugLayers = true;
-				} else if (strcmp(opt_name, "disable-color-management") == 0) {
-					g_bForceDisableColorMgmt = true;
-				} else if (strcmp(opt_name, "xwayland-count") == 0) {
-					g_nXWaylandCount = atoi( optarg );
-				} else if (strcmp(opt_name, "composite-debug") == 0) {
-					cv_composite_debug |= CompositeDebugFlag::Markers;
-					cv_composite_debug |= CompositeDebugFlag::PlaneBorders;
-				} else if (strcmp(opt_name, "hdr-debug-heatmap") == 0) {
-					cv_composite_debug |= CompositeDebugFlag::Heatmap;
-				} else if (strcmp(opt_name, "default-touch-mode") == 0) {
-					gamescope::cv_touch_click_mode = (gamescope::TouchClickMode) atoi( optarg );
-				} else if (strcmp(opt_name, "generate-drm-mode") == 0) {
-					g_eGamescopeModeGeneration = parse_gamescope_mode_generation( optarg );
-				} else if (strcmp(opt_name, "force-orientation") == 0) {
-					g_DesiredInternalOrientation = force_orientation( optarg );
-				} else if (strcmp(opt_name, "sharpness") == 0 ||
-						   strcmp(opt_name, "fsr-sharpness") == 0) {
-					g_upscaleFilterSharpness = atoi( optarg );
-				} else if (strcmp(opt_name, "rt") == 0) {
-					g_bRt = true;
-				} else if (strcmp(opt_name, "prefer-vk-device") == 0) {
-					unsigned vendorID;
-					unsigned deviceID;
-					sscanf( optarg, "%X:%X", &vendorID, &deviceID );
-					g_preferVendorID = vendorID;
-					g_preferDeviceID = deviceID;
-				} else if (strcmp(opt_name, "immediate-flips") == 0) {
-					cv_tearing_enabled = true;
-				} else if (strcmp(opt_name, "force-grab-cursor") == 0) {
-					g_bForceRelativeMouse = true;
-				} else if (strcmp(opt_name, "display-index") == 0) {
-					g_nNestedDisplayIndex = atoi( optarg );
-				} else if (strcmp(opt_name, "adaptive-sync") == 0) {
-					cv_adaptive_sync = true;
-				} else if (strcmp(opt_name, "expose-wayland") == 0) {
-					g_bExposeWayland = true;
-				} else if (strcmp(opt_name, "backend") == 0) {
-					eCurrentBackend = parse_backend_name( optarg );
-				} else if (strcmp(opt_name, "cursor-scale-height") == 0) {
-					g_nCursorScaleHeight = atoi(optarg);
-				} else if (strcmp(opt_name, "mangoapp") == 0) {
-					g_bLaunchMangoapp = true;
-				}
-				break;
-			case '?':
-				fprintf( stderr, "See --help for a list of options.\n" );
-				return 1;
-		}
-	}
+    int o;
+    int opt_index = -1;
+    while ((o = getopt_long(argc, argv, gamescope_optstring, gamescope_options, &opt_index)) != -1)
+    {
+        const char *opt_name;
+        switch (o) {
+            case 'w':
+                g_nNestedWidth = atoi(optarg);
+                break;
+            case 'h':
+                g_nNestedHeight = atoi(optarg);
+                break;
+            case 'r':
+                g_nNestedRefresh = gamescope::ConvertHztomHz(atoi(optarg));
+                break;
+            case 'W':
+                g_nPreferredOutputWidth = atoi(optarg);
+                break;
+            case 'H':
+                g_nPreferredOutputHeight = atoi(optarg);
+                break;
+            case 'o':
+                g_nNestedUnfocusedRefresh = gamescope::ConvertHztomHz(atoi(optarg));
+                break;
+            case 'm':
+                g_flMaxWindowScale = atof(optarg);
+                break;
+            case 'S':
+                g_wantedUpscaleScaler = parse_upscaler_scaler(optarg);
+                break;
+            case 'F':
+                g_wantedUpscaleFilter = parse_upscaler_filter(optarg);
+                break;
+            case 'b':
+                g_bBorderlessOutputWindow = true;
+                break;
+            case 'f':
+                g_bFullscreen = true;
+                break;
+            case 'O':
+                g_sOutputName = optarg;
+                break;
+            case 'g':
+                g_bGrabbed = true;
+                break;
+            case 's':
+                g_mouseSensitivity = atof(optarg);
+                break;
+            case 'e':
+                steamMode = true;
+                break;
+            case 0:
+                opt_name = gamescope_options[opt_index].name;
+                if (strcmp(opt_name, "help") == 0) {
+                    fprintf(stderr, "%s", usage);
+                    return 0;
+                } else if (strcmp(opt_name, "version") == 0) {
+                    return 0;
+                } else if (strcmp(opt_name, "debug-layers") == 0) {
+                    g_bDebugLayers = true;
+                } else if (strcmp(opt_name, "disable-color-management") == 0) {
+                    g_bForceDisableColorMgmt = true;
+                } else if (strcmp(opt_name, "xwayland-count") == 0) {
+                    g_nXWaylandCount = atoi(optarg);
+                } else if (strcmp(opt_name, "composite-debug") == 0) {
+                    cv_composite_debug |= CompositeDebugFlag::Markers;
+                    cv_composite_debug |= CompositeDebugFlag::PlaneBorders;
+                } else if (strcmp(opt_name, "hdr-debug-heatmap") == 0) {
+                    cv_composite_debug |= CompositeDebugFlag::Heatmap;
+                } else if (strcmp(opt_name, "default-touch-mode") == 0) {
+                    gamescope::cv_touch_click_mode = (gamescope::TouchClickMode)atoi(optarg);
+                } else if (strcmp(opt_name, "generate-drm-mode") == 0) {
+                    g_eGamescopeModeGeneration = parse_gamescope_mode_generation(optarg);
+                } else if (strcmp(opt_name, "force-orientation") == 0) {
+                    g_DesiredInternalOrientation = force_orientation(optarg);
+                } else if (strcmp(opt_name, "sharpness") == 0 ||
+                           strcmp(opt_name, "fsr-sharpness") == 0) {
+                    g_upscaleFilterSharpness = atoi(optarg);
+                } else if (strcmp(opt_name, "rt") == 0) {
+                    g_bRt = true;
+                } else if (strcmp(opt_name, "prefer-vk-device") == 0) {
+                    unsigned vendorID;
+                    unsigned deviceID;
+                    sscanf(optarg, "%X:%X", &vendorID, &deviceID);
+                    g_preferVendorID = vendorID;
+                    g_preferDeviceID = deviceID;
+                } else if (strcmp(opt_name, "immediate-flips") == 0) {
+                    cv_tearing_enabled = true;
+                } else if (strcmp(opt_name, "force-grab-cursor") == 0) {
+                    g_bForceRelativeMouse = true;
+                } else if (strcmp(opt_name, "display-index") == 0) {
+                    g_nNestedDisplayIndex = atoi(optarg);
+                } else if (strcmp(opt_name, "adaptive-sync") == 0) {
+                    cv_adaptive_sync = true;
+                } else if (strcmp(opt_name, "expose-wayland") == 0) {
+                    g_bExposeWayland = true;
+                } else if (strcmp(opt_name, "backend") == 0) {
+                    eCurrentBackend = parse_backend_name(optarg);
+                } else if (strcmp(opt_name, "cursor-scale-height") == 0) {
+                    g_nCursorScaleHeight = atoi(optarg);
+                } else if (strcmp(opt_name, "mangoapp") == 0) {
+                    g_bLaunchMangoapp = true;
+                }
+                break;
+            case '?':
+                fprintf(stderr, "See --help for a list of options.\n");
+                return 1;
+        }
+    }
 
-	if ( gamescope::Process::HasCapSysNice() )
-	{
-		gamescope::Process::SetNice( -20 );
+    if (gamescope::Process::HasCapSysNice())
+    {
+        gamescope::Process::SetNice(-20);
 
-		if ( g_bRt )
-			gamescope::Process::SetRealtime();
-	}
-	else
-	{
-		fprintf( stderr, "No CAP_SYS_NICE, falling back to regular-priority compute and threads.\nPerformance will be affected.\n" );
-	}
+        if (g_bRt)
+            gamescope::Process::SetRealtime();
+    }
+    else
+    {
+        fprintf(stderr, "No CAP_SYS_NICE, falling back to regular-priority compute and threads.\nPerformance will be affected.\n");
+    }
+
+    // Basalt integration
+    GamescopeVkDevice gsDevice = {
+        .device = vkDevice,
+        .physicalDevice = vkPhysicalDevice,
+        .instance = vkInstance,
+        .graphicsQueue = vkGraphicsQueue,
+        .graphicsQueueFamilyIndex = graphicsQueueFamilyIndex
+    };
+
+    Config config;
+    std::string configPath = "default/config.conf";
+    if (argc > 1) {
+        configPath = argv[1];
+    }
+
+    if (!config.loadFromFile(configPath)) {
+        std::cerr << "Failed to load configuration: " << configPath << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    GamescopeEffectsManager effectsManager;
+    try {
+        effectsManager.initialize(&gsDevice, configPath);
+    } catch (const std::exception& e) {
+        std::cerr << "Error initializing Basalt effects manager: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    for (uint32_t imageIndex = 0; imageIndex < swapchainImageCount; ++imageIndex) {
+        VkCommandBuffer commandBuffer = commandBuffers[imageIndex];
+
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+        try {
+            effectsManager.applyEffects(commandBuffer, imageIndex);
+        } catch (const std::exception& e) {
+            std::cerr << "Error applying Basalt effects: " << e.what() << std::endl;
+        }
+
+        vkEndCommandBuffer(commandBuffer);
+    }
+
+    effectsManager.~GamescopeEffectsManager();
+
+    return 0;
+}
+
 
 #if 0
 	while( !IsInDebugSession() )
